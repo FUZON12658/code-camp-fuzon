@@ -191,12 +191,14 @@ router.post('/validateMail',async (req, res)=>{
 });
 
 
+
 router.post('/validatePassword', async (req, res) => {
   const { email, password } = req.body;
 
   function isCommonPassword(password, email) {
     // Common passwords list
-    const commonPasswords = ["password", "password123", "password0123"];
+    const commonPasswords =["password","password1","password12","password012","password123", "password0123",
+    "password1234", "password01234","password12345", "password012345"];
 
     // Extract username from email (assuming email is in the format username@example.com)
     const username = email.match(/^([^@]+)@/) ? email.match(/^([^@]+)@/)[1] : null;
@@ -221,7 +223,7 @@ router.post('/validatePassword', async (req, res) => {
       const digitPattern = /\d/g;
       const usernameDigits = username.match(digitPattern);
       if (usernameDigits) {
-        for (let i = 1; i <= 5; i++) {
+        for (let i = 1; i <= 9; i++) {
           const modifiedPasswordAdd = username.replace(digitPattern, (match) => {
             const digit = parseInt(match);
             return ((digit + i) % 10).toString(); // Adding i to each digit and wrapping around to 0 if it becomes 10
@@ -234,7 +236,6 @@ router.post('/validatePassword', async (req, res) => {
           });
 
           if (modifiedPasswordAdd === password || modifiedPasswordSubtract === password) {
-            console.log("add or subtract returned true");
             return true;
           }
         }
@@ -248,39 +249,33 @@ router.post('/validatePassword', async (req, res) => {
   function doesPasswordFollowEmailPattern(password, email) {
     // Check if password includes common patterns based on email
     const emailPrefix = email.split('@')[0];
-  
+
     // Successive patterns like 1, 12, 123, ..., 1234567890
     for (let i = 1; i <= 10; i++) {
       const successivePattern = Array.from({ length: i }, (_, index) => emailPrefix.slice(0, index + 1));
-      const joinedPattern = successivePattern.join('');
-      
-      // Check if the password starts with the joined pattern
-      if (password.startsWith(joinedPattern)) {
+      if (successivePattern.some(pattern => password.includes(pattern))) {
         return true;
       }
     }
-  
+
     // Split digit and alphabet portion and check
     const splitPassword = password.match(/([a-zA-Z]+)([0-9]+)/);
     if (splitPassword) {
       const [, alphabetPart, digitPart] = splitPassword;
-      
-      // Check if the password is in the format alphabet + 1
       if (emailPrefix.includes(alphabetPart) && emailPrefix.includes(digitPart)) {
         return true;
       }
     }
-  
+
     return false;
   }
-  
+
   if (isCommonPassword(password, email)) {
     res.status(400).json({ error: "Password rejected. Choose a stronger password." });
   } else {
     res.status(200).json({ success: "Password accepted. Welcome!" });
   }
 });
-
 
 router.post('/signup', [
   body('email', 'Enter a valid mail').isEmail(),
