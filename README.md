@@ -46,6 +46,8 @@ http: an error has occurred
 
 
 ***addition of timestamp to the logs***
+
+```
 const winston = require ('winston');
 
 const logFormat = winston.format.printf(({level, message, timestamp})=>{
@@ -62,3 +64,4 @@ const logger = winston.createLogger({
 })
 
 module.exports = logger;
+```
