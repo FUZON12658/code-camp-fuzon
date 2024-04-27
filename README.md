@@ -1,4 +1,4 @@
-##INSTRUCTION FOR SETTING UP THE GAME##
+## INSTRUCTION FOR SETTING UP THE GAME ##
 
 ***Step 1***: Create a new java class library project under java with ant
 ***Step 2***: Save all the .java files in src
